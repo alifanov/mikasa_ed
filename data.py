@@ -7,8 +7,35 @@ from abc import ABCMeta, abstractmethod
 from event import MarketEvent
 
 
+class DataPoint:
+    def __init__(self, dt):
+        self.dt = dt
+
+    def to_dict(self):
+        return self.dt
+
+    def __getattr__(self, key):
+        return self.dt[key]
+
+
 class DataHandler(object):
     __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def get_latest_bar(self, symbol):
+        raise NotImplementedError("Should implement get_latest_bar()")
+
+    @abstractmethod
+    def get_latest_bar_datetime(self, symbol):
+        raise NotImplementedError("Should implement get_latest_bar_datetime()")
+
+    @abstractmethod
+    def get_latest_bar_value(self, symbol, val_type):
+        raise NotImplementedError("Should implement get_latest_bar_value()")
+
+    @abstractmethod
+    def get_latest_bar_values(self, symbol, val_type, N=1):
+        raise NotImplementedError("Should implement get_latest_bar_values()")
 
     @abstractmethod
     def get_latest_bars(self, symbol, N=1):
@@ -61,14 +88,31 @@ class HistoricCSVDataHandler(DataHandler):
 
     def _get_new_bar(self, symbol):
         for b in self.symbol_data[symbol]:
-            yield {
+            yield DataPoint({
                 'symbol': symbol,
                 'datetime': datetime.datetime.fromtimestamp(b[0]),
                 'open': b[1][0],
                 'high': b[1][1],
                 'low': b[1][2],
                 'close': b[1][3]
-            }  # TODO: add datapoint
+            })
+
+    def get_latest_bar(self, symbol):
+        try:
+            bars_list = self.latest_symbol_data[symbol]
+        except KeyError:
+            print("That symbol is not available in the historical data set.")
+        else:
+            return bars_list[-1]
+
+    def get_latest_bar_datetime(self, symbol):
+        return self.get_latest_bar(symbol)['datetime']
+
+    def get_latest_bar_value(self, symbol, val_type):
+        return self.get_latest_bar(symbol)[val_type]
+
+    def get_latest_bars_values(self, symbol, val_type, N=1):
+        return [b[val_type] for b in self.get_latest_bars(symbol, N)]
 
     def get_latest_bars(self, symbol, N=1):
         try:

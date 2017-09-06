@@ -11,11 +11,12 @@ class MarketEvent(Event):
 
 
 class SignalEvent(Event):
-    def __init__(self, symbol, datetime, signal_type, strength):
+    def __init__(self, strategy_id, symbol, datetime, signal_type, strength):
         self.type = 'SIGNAL'
         self.symbol = symbol
+        self.strategy_id = strategy_id
         self.datetime = datetime
-        self.signal_type = signal_type
+        self.signal_type = signal_type # LONG, SHORT, EXIT
         self.strength = strength
 
 
@@ -34,13 +35,14 @@ class OrderEvent(Event):
 
 class FillEvent(Event):
     def __init__(self, timeindex, symbol, exchange, quantity,
-                 direction, commission=None):
+                 direction, fill_cost, commission=None):
         self.type = 'FILL'
         self.timeindex = timeindex
         self.symbol = symbol
         self.exchange = exchange
         self.quantity = quantity
         self.direction = direction
+        self.fill_cost = fill_cost
 
         # Calculate commission
         if commission is None:
@@ -49,11 +51,11 @@ class FillEvent(Event):
             self.commission = commission
 
     def calculate_commission(self, broker):
-        full_cost = 1.3
+        commission = 1.3
         if broker == Broker.INTERACTIVE_BROKER:
             if self.quantity <= 500:
-                full_cost = max(1.3, 0.013 * self.quantity)
+                commission = max(1.3, 0.013 * self.quantity)
             else:  # Greater than 500
-                full_cost = max(1.3, 0.008 * self.quantity)
-            full_cost = min(full_cost, 0.5 / 100.0 * self.quantity)
-        return full_cost
+                commission = max(1.3, 0.008 * self.quantity)
+                commission = min(commission, 0.5 / 100.0 * self.quantity)
+        return commission
