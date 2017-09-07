@@ -59,16 +59,14 @@ class NaivePortfolio(Portfolio):
         return d
 
     def update_timeindex(self, event):
-        bars = {}
-        for sym in self.symbol_list:
-            bars[sym] = self.bars.get_latest_bars(sym, N=1)
-
-        dt = bars[self.symbol_list[0]][0]['datetime']
+        latest_datetime = self.bars.get_latest_bar_datetime(
+            self.symbol_list[0]
+        )
 
         # Update positions
+        # ================
         dp = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
-        dp['datetime'] = dt
-
+        dp['datetime'] = latest_datetime
         for s in self.symbol_list:
             dp[s] = self.current_positions[s]
 
@@ -76,20 +74,18 @@ class NaivePortfolio(Portfolio):
         self.all_positions.append(dp)
 
         # Update holdings
+        # ===============
         dh = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
-        dh['datetime'] = dt
+        dh['datetime'] = latest_datetime
         dh['cash'] = self.current_holdings['cash']
         dh['commission'] = self.current_holdings['commission']
         dh['total'] = self.current_holdings['cash']
-
         for s in self.symbol_list:
             # Approximation to the real value
-            market_value = self.current_positions[s] * 1.0 # bars[s][0][5] #TODO: there should be volume
+            market_value = self.current_positions[s] * \
+                           self.bars.get_latest_bar_value(s, "close")
             dh[s] = market_value
             dh['total'] += market_value
-
-        # Append the current holdings
-        self.all_holdings.append(dh)
 
     def update_positions_from_fill(self, fill):
         # Check whether the fill is a buy or sell
