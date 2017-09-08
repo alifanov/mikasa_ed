@@ -70,7 +70,8 @@ class HistoricCSVDataHandler(DataHandler):
                 fname,
                 header=1,
                 index_col=0,
-                names=self.fields
+                names=self.fields,
+                nrows=2000
             )
 
             # Combine the index to pad forward values
@@ -106,13 +107,13 @@ class HistoricCSVDataHandler(DataHandler):
             return bars_list[-1]
 
     def get_latest_bar_datetime(self, symbol):
-        return self.get_latest_bar(symbol)['datetime']
+        return self.get_latest_bar(symbol).datetime
 
     def get_latest_bar_value(self, symbol, val_type):
-        return self.get_latest_bar(symbol)[val_type]
+        return getattr(self.get_latest_bar(symbol), val_type)
 
     def get_latest_bars_values(self, symbol, val_type, N=1):
-        return [b[val_type] for b in self.get_latest_bars(symbol, N)]
+        return [getattr(b, val_type) for b in self.get_latest_bars(symbol, N)]
 
     def get_latest_bars(self, symbol, N=1):
         try:

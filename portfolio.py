@@ -7,8 +7,6 @@ from event import FillEvent, OrderEvent
 
 from performance import create_sharpe_ratio, create_drawdowns
 
-import matplotlib.pyplot as plt
-
 
 class Portfolio(object):
     __metaclass__ = ABCMeta
@@ -88,6 +86,8 @@ class NaivePortfolio(Portfolio):
             dh[s] = market_value
             dh['total'] += market_value
 
+        self.all_holdings.append(dh)
+
     def update_positions_from_fill(self, fill):
         # Check whether the fill is a buy or sell
         fill_dir = 0
@@ -108,7 +108,7 @@ class NaivePortfolio(Portfolio):
             fill_dir = -1
 
         # Update holdings list with new quantities
-        fill_cost = self.bars.get_latest_bars(fill.symbol)[0]['close']  # Close price
+        fill_cost = self.bars.get_latest_bars(fill.symbol)[0].close
         cost = fill_dir * fill_cost * fill.quantity
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
@@ -167,5 +167,6 @@ class NaivePortfolio(Portfolio):
         stats = [("Total Return", "%0.2f%%" % ((total_return - 1.0) * 100.0)),
                  ("Sharpe Ratio", "%0.2f" % sharpe_ratio),
                  ("Max Drawdown", "%0.2f%%" % (max_dd * 100.0)),
-                 ("Drawdown Duration", "%d" % dd_duration)]
+                 ("Drawdown Duration", "%d" % dd_duration)
+                 ]
         return stats

@@ -19,7 +19,9 @@ class Backtest(object):
                  data_handler,
                  execution_handler,
                  portfolio,
-                 strategy):
+                 strategy,
+                 fields
+                 ):
         """
         Initialises the backtest.
         Parameters:
@@ -40,6 +42,7 @@ class Backtest(object):
         self.heartbeat = heartbeat
         self.start_date = start_date
         self.data_handler_cls = data_handler
+        self.fields = fields
         self.execution_handler_cls = execution_handler
         self.portfolio_cls = portfolio
         self.strategy_cls = strategy
@@ -53,7 +56,7 @@ class Backtest(object):
     def _generate_trading_instances(self):
         print("Creating DataHandler, Strategy, Portfolio and ExecutionHandler")
         self.data_handler = self.data_handler_cls(self.events, self.csv_dir,
-                                                  self.symbol_list)
+                                                  self.symbol_list, self.fields)
         self.strategy = self.strategy_cls(self.data_handler, self.events)
         self.portfolio = self.portfolio_cls(self.data_handler, self.events,
                                             self.start_date,
@@ -110,7 +113,7 @@ class Backtest(object):
         fig = plt.figure()
         fig.patch.set_facecolor('white')
 
-        if not self.portfolio.equity_curve:
+        if self.portfolio.equity_curve is not None:
             self.portfolio.create_equity_curve_dataframe()
         data = self.portfolio.equity_curve
 
@@ -123,8 +126,8 @@ class Backtest(object):
         data['returns'].plot(ax=ax2, color="black", lw=2.)
         plt.grid(True)
         # Plot the returns
-        ax3 = fig.add_subplot(313, ylabel='Drawdowns, % ')
-        data['drawdown'].plot(ax=ax3, color="red", lw=2.)
+        ax3 = fig.add_subplot(313, ylabel='Total, % ')
+        data['total'].plot(ax=ax3, color="red", lw=2.)
         plt.grid(True)
         # Plot the figure
         plt.show()
