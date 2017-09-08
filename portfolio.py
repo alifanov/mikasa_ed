@@ -37,6 +37,7 @@ class NaivePortfolio(Portfolio):
         self.current_holdings = self.construct_current_holdings()
 
         self.orders = []
+        self.equity_curve = None
 
     def construct_all_positions(self):
         d = dict((k, v) for k, v in [(s, 0) for s in self.symbol_list])
@@ -147,22 +148,6 @@ class NaivePortfolio(Portfolio):
             if order_event:
                 self.orders.append(order_event)
                 self.events.put(order_event)
-
-    def plot_chart(self):
-        dfs = {}
-        for s in self.symbol_list:
-            dfs[s] = pd.DataFrame(self.bars.get_latest_bars(s, self.bars.index))
-            fields = [c for c in dfs[s].columns if c != 'datetime']
-            dfs[s] = dfs[s].rename(columns={f: '{}_{}'.format(s, f) for f in fields})
-            dfs[s].set_index('datetime', inplace=True)
-
-        df = pd.concat(dfs, axis=1)
-        df.plot()
-        # buy_orders = [o for o in self.orders if o.type == 'BUY']
-        # sell_orders = [o for o in self.orders if o.type == 'SELL']
-        # plt.plot([o['datetime'] for o in buy_orders], [o['price'] for o in buy_orders], 'g^')
-        # plt.plot([o['datetime'] for o in buy_orders], [o['price'] for o in sell_orders], 'rv')
-        plt.show()
 
     def create_equity_curve_dataframe(self):
         curve = pd.DataFrame(self.all_holdings)
