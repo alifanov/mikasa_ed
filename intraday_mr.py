@@ -12,7 +12,7 @@ from execution import SimulatedExecutionHandler
 
 
 class IntradayOLSMRStrategy(Strategy):
-    def __init__(self, bars, events, ols_window=100, zscore_low=0.5, zscore_high=3.0):
+    def __init__(self, bars, events, ols_window=500, zscore_low=0.5, zscore_high=3.0):
         """
         Initialises the stat arb strategy.
         Parameters:
@@ -93,11 +93,11 @@ class IntradayOLSMRStrategy(Strategy):
 
 
 if __name__ == "__main__":
-    csv_dir = './datasets/'  # CHANGE THIS!
+    csv_dir = './datasets/'
     symbol_list = ['BTC_ETC', 'BTC_LTC']
     initial_capital = 1000.0
     heartbeat = 0.0
-    start_date = datetime.datetime(2017, 4, 1, 10, 41, 0)
+    start_date = datetime.datetime(2017, 4, 21, 0, 0, 1)
     backtest = Backtest(
         csv_dir,
         symbol_list,

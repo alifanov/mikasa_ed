@@ -2,3 +2,4 @@ statsmodels
 sklearn
 matplotlib
 pytest
+jupyter

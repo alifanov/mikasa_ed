@@ -127,7 +127,7 @@ class NaivePortfolio(Portfolio):
         direction = signal.signal_type
         strength = signal.strength
 
-        mkt_quantity = floor(100 * strength)
+        mkt_quantity = 100
         cur_quantity = self.current_positions[symbol]
         order_type = 'MKT'
 

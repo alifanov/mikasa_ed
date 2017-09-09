@@ -72,6 +72,7 @@ class HistoricCSVDataHandler(DataHandler):
                 header=0,
                 index_col=0,
                 # names=self.fields,
+                nrows=2000
             )
 
             # Combine the index to pad forward values
