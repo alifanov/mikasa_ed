@@ -14,6 +14,9 @@ class DataPoint:
     def to_dict(self):
         return self.dt
 
+    def __repr__(self):
+        return str(self.dt)
+
     def __getattr__(self, key):
         return self.dt[key]
 
@@ -57,8 +60,6 @@ class HistoricCSVDataHandler(DataHandler):
         self.latest_symbol_data = {}
         self.continue_backtest = True
 
-        self.index = 0
-
         self._open_convert_csv_files()
 
     def _open_convert_csv_files(self):
@@ -68,10 +69,9 @@ class HistoricCSVDataHandler(DataHandler):
 
             self.symbol_data[s] = pd.read_csv(
                 fname,
-                header=1,
+                header=0,
                 index_col=0,
-                names=self.fields,
-                nrows=2000
+                # names=self.fields,
             )
 
             # Combine the index to pad forward values
@@ -92,10 +92,11 @@ class HistoricCSVDataHandler(DataHandler):
             yield DataPoint({
                 'symbol': symbol,
                 'datetime': datetime.datetime.fromtimestamp(b[0]),
-                'open': b[1][0],
-                'high': b[1][1],
-                'low': b[1][2],
-                'close': b[1][3]
+                'timestamp': b[0],
+                'open': b[1].open,
+                'high': b[1].high,
+                'low': b[1].low,
+                'close': b[1].close
             })
 
     def get_latest_bar(self, symbol):
@@ -132,5 +133,4 @@ class HistoricCSVDataHandler(DataHandler):
             else:
                 if bar is not None:
                     self.latest_symbol_data[s].append(bar)
-        self.index += 1
         self.events.put(MarketEvent())
