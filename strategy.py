@@ -38,7 +38,12 @@ class BuyAndHoldStrategy(Strategy):
                 if bars is not None and bars != []:
                     if not self.bought[s]:
                         # (Symbol, Datetime, Type = LONG, SHORT or EXIT)
-                        signal = SignalEvent(bars[0][0], bars[0][1], 'LONG', 1.0)
+                        signal = SignalEvent(
+                            'BUY_AND_HOLD',
+                            bars[0].symbol,
+                            bars[0].datetime,
+                            'LONG',
+                            1.0)
                         self.queue.put(signal)
                         self.bought[s] = True
 
@@ -50,7 +55,6 @@ class SMAStrategy(Strategy):
         self.period = period
 
     def calculate_signals(self, event):
-        print(self.bars.index)
         if event.type == 'MARKET':
             if self.bars.index > self.period:
 
