@@ -10,7 +10,7 @@ class DataHandlerTestCase(TestCase):
         events_queue = queue.Queue(100)
         data = HistoricCSVDataHandler(
             events_queue,
-            './datasets',
+            './tests/datasets',
             [s],
             ['open', 'high', 'low', 'close']
         )
@@ -19,15 +19,15 @@ class DataHandlerTestCase(TestCase):
 
         data.update_bars()
 
-        d = data.get_latest_bar(s)
+        d = data.get_latest_bars(s)[0]
         self.assertEqual(round(d.open, 8), 0.00258999)
         self.assertEqual(round(d.high, 8), 0.00259506)
         self.assertEqual(round(d.low, 8), 0.00258998)
         self.assertEqual(round(d.close, 8), 0.00259474)
 
-        self.assertEqual(data.get_latest_bar(s), d)
+        self.assertEqual(data.get_latest_bars(s)[0], d)
         self.assertEqual(data.get_latest_bars(s), [d])
-        self.assertEqual(data.get_latest_bar_datetime(s), d.datetime)
-        self.assertEqual(round(data.get_latest_bar_value(s, 'open'), 8), 0.00258999)
+        self.assertEqual(data.get_latest_bars_values(s, 'datetime')[0], d.datetime)
+        self.assertEqual(round(data.get_latest_bars_values(s, 'open')[0], 8), 0.00258999)
         values = data.get_latest_bars_values(s, 'open')
         self.assertEqual(round(values[0], 8), 0.00258999)

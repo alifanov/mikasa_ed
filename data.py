@@ -25,19 +25,7 @@ class DataHandler(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def get_latest_bar(self, symbol):
-        raise NotImplementedError("Should implement get_latest_bar()")
-
-    @abstractmethod
-    def get_latest_bar_datetime(self, symbol):
-        raise NotImplementedError("Should implement get_latest_bar_datetime()")
-
-    @abstractmethod
-    def get_latest_bar_value(self, symbol, val_type):
-        raise NotImplementedError("Should implement get_latest_bar_value()")
-
-    @abstractmethod
-    def get_latest_bar_values(self, symbol, val_type, N=1):
+    def get_latest_bars_values(self, symbol, val_type, N=1):
         raise NotImplementedError("Should implement get_latest_bar_values()")
 
     @abstractmethod
@@ -99,20 +87,6 @@ class HistoricCSVDataHandler(DataHandler):
                 'low': b[1].low,
                 'close': b[1].close
             })
-
-    def get_latest_bar(self, symbol):
-        try:
-            bars_list = self.latest_symbol_data[symbol]
-        except KeyError:
-            print("That symbol is not available in the historical data set.")
-        else:
-            return bars_list[-1]
-
-    def get_latest_bar_datetime(self, symbol):
-        return self.get_latest_bar(symbol).datetime
-
-    def get_latest_bar_value(self, symbol, val_type):
-        return getattr(self.get_latest_bar(symbol), val_type)
 
     def get_latest_bars_values(self, symbol, val_type, N=1):
         return [getattr(b, val_type) for b in self.get_latest_bars(symbol, N)]

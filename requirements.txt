@@ -3,3 +3,4 @@ sklearn
 matplotlib
 pytest
 jupyter
+requests

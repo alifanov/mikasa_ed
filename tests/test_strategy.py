@@ -11,7 +11,7 @@ class StrategyTestCase(TestCase):
         events_queue = queue.Queue(100)
         bars = HistoricCSVDataHandler(
             events_queue,
-            './datasets/',
+            './tests/datasets/',
             ['BTC_ETC'],
             ['open', 'high', 'low', 'close']
         )

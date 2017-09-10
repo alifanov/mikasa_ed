@@ -58,9 +58,10 @@ class NaivePortfolio(Portfolio):
         return d
 
     def update_timeindex(self, event):
-        latest_datetime = self.bars.get_latest_bar_datetime(
-            self.symbol_list[0]
-        )
+        latest_datetime = self.bars.get_latest_bars_values(
+            self.symbol_list[0],
+            'datetime'
+        )[0]
 
         # Update positions
         # ================
@@ -82,7 +83,7 @@ class NaivePortfolio(Portfolio):
         for s in self.symbol_list:
             # Approximation to the real value
             market_value = self.current_positions[s] * \
-                           self.bars.get_latest_bar_value(s, "close")
+                           self.bars.get_latest_bars_values(s, "close")[0]
             dh[s] = market_value
             dh['total'] += market_value
 
