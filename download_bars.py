@@ -10,22 +10,23 @@ POLONIEX_TIME_FRAME_MAP = {
 }
 
 FIELDS = [
-            'datetime',
-            'open',
-            'high',
-            'low',
-            'close'
-        ]
+    'datetime',
+    'open',
+    'high',
+    'low',
+    'close',
+    'volume'
+]
 
 
 def download_bars(pair, start_date, end_date, time_frame='5min'):
     r = requests.get('https://poloniex.com/public?command=returnChartData',
-        params={
-            'currencyPair': pair,
-            'start': start_date.timestamp(),
-            'end': end_date.timestamp(),
-            'period': POLONIEX_TIME_FRAME_MAP[time_frame]
-        })
+                     params={
+                         'currencyPair': pair,
+                         'start': start_date.timestamp(),
+                         'end': end_date.timestamp(),
+                         'period': POLONIEX_TIME_FRAME_MAP[time_frame]
+                     })
     r.raise_for_status()
     with open('datasets/{}/{}.csv'.format(time_frame, pair), 'w') as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
@@ -35,6 +36,8 @@ def download_bars(pair, start_date, end_date, time_frame='5min'):
             dd = {f: d[f] for f in FIELDS}
             writer.writerow(dd)
 
+
 if __name__ == "__main__":
-    for p in ['5min', '30min', 'day']:
-        download_bars('BTC_LTC', datetime.utcnow() - timedelta(days=365), datetime.utcnow(), time_frame=p)
+    for pair in ['BTC_ETC', 'BTC_LTC']:
+        for p in ['5min', '30min', 'day']:
+            download_bars(pair, datetime.utcnow() - timedelta(days=365), datetime.utcnow(), time_frame=p)
