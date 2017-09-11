@@ -38,7 +38,7 @@ class DataHandler(object):
 
 
 class HistoricCSVDataHandler(DataHandler):
-    def __init__(self, events, csv_dir, symbol_list, fields):
+    def __init__(self, events, csv_dir, symbol_list, fields, limit=2000):
         self.events = events
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
@@ -47,6 +47,8 @@ class HistoricCSVDataHandler(DataHandler):
         self.symbol_data = {}
         self.latest_symbol_data = {}
         self.continue_backtest = True
+
+        self.limit = limit
 
         self._open_convert_csv_files()
 
@@ -60,7 +62,7 @@ class HistoricCSVDataHandler(DataHandler):
                 header=0,
                 index_col=0,
                 # names=self.fields,
-                nrows=2000
+                nrows=self.limit
             )
 
             # Combine the index to pad forward values
