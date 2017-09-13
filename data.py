@@ -38,7 +38,7 @@ class DataHandler(object):
 
 
 class HistoricCSVDataHandler(DataHandler):
-    def __init__(self, events, csv_dir, symbol_list, fields, limit=None):
+    def __init__(self, events, csv_dir, symbol_list, fields, limit=2000):
         self.events = events
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
