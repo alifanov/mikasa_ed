@@ -57,7 +57,7 @@ class FillEvent(Event):
             self.commission = commission
 
     def calculate_commission(self, broker):
-        commission = 0.002 * self.quantity
+        commission = 0.002
         # if broker == Broker.INTERACTIVE_BROKER:
         #     if self.quantity <= 500:
         #         commission = max(1.3, 0.013 * self.quantity)

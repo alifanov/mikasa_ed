@@ -115,9 +115,9 @@ class NaivePortfolio(Portfolio):
             price = self.bars.get_latest_bars(fill.symbol)[0].close
         cost = fill_dir * price * fill.quantity
         self.current_holdings[fill.symbol] += cost
-        self.current_holdings['commission'] += fill.commission
-        self.current_holdings['cash'] -= (cost + fill.commission)
-        self.current_holdings['total'] -= (cost + fill.commission)
+        self.current_holdings['commission'] += fill.commission*cost
+        self.current_holdings['cash'] -= (cost * (1.0 + fill.commission))
+        self.current_holdings['total'] -= (cost * (1.0 + fill.commission))
 
     def update_fill(self, event):
         if event.type == 'FILL':
