@@ -9,6 +9,9 @@ class Event:
 class MarketEvent(Event):
     type = 'MARKET'
 
+    def __init__(self, market_data):
+        self.market_data = market_data
+
 
 class SignalEvent(Event):
     def __init__(self, strategy_id, symbol, datetime, signal_type, strength):
@@ -22,12 +25,14 @@ class SignalEvent(Event):
 
 
 class OrderEvent(Event):
-    def __init__(self, symbol, order_type, quantity, direction):
+    def __init__(self, symbol, order_type, quantity, direction, price=None):
         self.type = 'ORDER'
         self.symbol = symbol
         self.order_type = order_type
         self.quantity = quantity
         self.direction = direction
+
+        self.price = price
 
     def print_order(self):
         print("Order: Symbol={}, Type={}, Quantity={}, Direction={}".format(self.symbol, self.order_type, self.quantity,
@@ -36,14 +41,14 @@ class OrderEvent(Event):
 
 class FillEvent(Event):
     def __init__(self, timeindex, symbol, exchange, quantity,
-                 direction, fill_cost, commission=None):
+                 direction, price, commission=None):
         self.type = 'FILL'
         self.timeindex = timeindex
         self.symbol = symbol
         self.exchange = exchange
         self.quantity = quantity
         self.direction = direction
-        self.fill_cost = fill_cost
+        self.price = price
 
         # Calculate commission
         if commission is None:

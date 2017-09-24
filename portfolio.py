@@ -109,8 +109,11 @@ class NaivePortfolio(Portfolio):
             fill_dir = -1
 
         # Update holdings list with new quantities
-        fill_cost = self.bars.get_latest_bars(fill.symbol)[0].close
-        cost = fill_dir * fill_cost * fill.quantity
+        if fill.price:
+            price = fill.price
+        else:
+            price = self.bars.get_latest_bars(fill.symbol)[0].close
+        cost = fill_dir * price * fill.quantity
         self.current_holdings[fill.symbol] += cost
         self.current_holdings['commission'] += fill.commission
         self.current_holdings['cash'] -= (cost + fill.commission)

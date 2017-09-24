@@ -110,4 +110,4 @@ class HistoricCSVDataHandler(DataHandler):
             else:
                 if bar is not None:
                     self.latest_symbol_data[s].append(bar)
-        self.events.put(MarketEvent())
+        self.events.put(MarketEvent(market_data={s: self.latest_symbol_data[s][-1] for s in self.symbol_list}))
