@@ -28,7 +28,7 @@ def download_bars(pair, start_date, end_date, time_frame='5min'):
                          'period': POLONIEX_TIME_FRAME_MAP[time_frame]
                      })
     r.raise_for_status()
-    with open('datasets/{}/{}.csv'.format(time_frame, pair), 'w') as f:
+    with open('../datasets/{}/{}.csv'.format(time_frame, pair), 'w') as f:
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         for d in r.json():
@@ -38,6 +38,6 @@ def download_bars(pair, start_date, end_date, time_frame='5min'):
 
 
 if __name__ == "__main__":
-    for pair in ['BTC_ETC', 'BTC_LTC']:
+    for pair in ['BTC_ETC', 'BTC_LTC', 'BTC_ETH']:
         for p in ['5min', '30min', 'day']:
             download_bars(pair, datetime.utcnow() - timedelta(days=365), datetime.utcnow(), time_frame=p)
