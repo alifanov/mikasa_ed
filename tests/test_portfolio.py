@@ -49,7 +49,7 @@ class PortfolioTestCase(TestCase):
         self.assertEqual(event.type, 'ORDER')
         self.assertEqual(event.order_type, 'MKT')
         self.assertEqual(event.direction, 'BUY')
-        self.assertEqual(event.quantity, 100)
+        self.assertEqual(event.quantity, 1)
 
     def test_update_fill(self):
         events_queue = queue.Queue(100)

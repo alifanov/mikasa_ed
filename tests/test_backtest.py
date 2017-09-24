@@ -51,12 +51,13 @@ class BacktestTestCase(TestCase):
             SimulatedExecutionHandler,
             NaivePortfolio,
             BuyAndHoldStrategy,
-            fields=['open', 'high', 'low', 'close']
+            fields=['open', 'high', 'low', 'close'],
+            ticks_limit=2000
         )
         backtest.simulate_trading()
         backtest.portfolio.create_equity_curve_dataframe()
         stats = backtest.portfolio.output_summary_stats()
-        self.assertEqual(stats, [('Total Return', '-0.01%'),
+        self.assertEqual(stats, [('Total Return', '-0.00%'),
                                  ('Sharpe Ratio', '-17.72'),
-                                 ('Max Drawdown', '0.02%'),
+                                 ('Max Drawdown', '0.00%'),
                                  ('Drawdown Duration', '2000')])

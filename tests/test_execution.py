@@ -11,7 +11,7 @@ class ExecutionTestCase(TestCase):
         events_queue = queue.Queue(100)
         oe = OrderEvent(
             'BTC_ETC',
-            'LONG',
+            'MKT',
             1.0,
             'BUY'
         )

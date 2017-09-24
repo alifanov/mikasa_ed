@@ -86,8 +86,8 @@ class Backtest(object):
                     if event is not None:
                         if event.type == 'MARKET':
                             self.strategy.calculate_signals(event)
+                            self.execution_handler.check_stop_orders(event)
                             self.portfolio.update_timeindex(event)
-                            self.execution_handler.process_stop_orders(event)
                         elif event.type == 'SIGNAL':
                             self.signals += 1
                             self.portfolio.update_signal(event)

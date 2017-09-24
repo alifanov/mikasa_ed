@@ -3,7 +3,6 @@ import pandas as pd
 from abc import ABCMeta, abstractmethod
 
 from event import SignalEvent
-from utils import rolling_beta, rolling_sm_ols
 
 import statsmodels.api as sm
 
