@@ -23,7 +23,12 @@ class SimulatedExecutionHandler(ExecutionHandler):
             for order in self.stop_orders:
                 for s in event.market_data:
                     if order.symbol == s:
-                        if event.market_data[s].close > order.price:
+                        if event.market_data[s].close > order.price and order.direction == 'BUY':
+                            fill_event = FillEvent(datetime.datetime.utcnow(), event.symbol,
+                                       'BACKTEST', event.quantity, event.direction, order.price)
+                            self.events.put(fill_event)
+                            self.stop_orders.remove(order)
+                        if event.market_data[s].close < order.price and order.direction == 'SELL':
                             fill_event = FillEvent(datetime.datetime.utcnow(), event.symbol,
                                        'BACKTEST', event.quantity, event.direction, order.price)
                             self.events.put(fill_event)
