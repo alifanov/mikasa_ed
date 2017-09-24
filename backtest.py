@@ -68,15 +68,12 @@ class Backtest(object):
         self.execution_handler = self.execution_handler_cls(self.events)
 
     def _run_backtest(self):
-        i = 0
         while True:
-            i += 1
-            # Update the market bars
             if self.data_handler.continue_backtest:
                 self.data_handler.update_bars()
             else:
                 break
-            # Handle the events
+
             while True:
                 try:
                     event = self.events.get(False)
