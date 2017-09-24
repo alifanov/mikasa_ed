@@ -108,7 +108,8 @@ if __name__ == "__main__":
         SimulatedExecutionHandler,
         NaivePortfolio,
         IntradayOLSMRStrategy,
-        fields=['open', 'high', 'low', 'close']
+        fields=['open', 'high', 'low', 'close'],
+        ticks_limit=2000
     )
     backtest.simulate_trading()
     backtest.plot()

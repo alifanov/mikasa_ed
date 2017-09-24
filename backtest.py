@@ -20,7 +20,8 @@ class Backtest(object):
                  execution_handler,
                  portfolio,
                  strategy,
-                 fields
+                 fields,
+                 ticks_limit=None
                  ):
         """
         Initialises the backtest.
@@ -41,11 +42,14 @@ class Backtest(object):
         self.initial_capital = initial_capital
         self.heartbeat = heartbeat
         self.start_date = start_date
+
         self.data_handler_cls = data_handler
         self.fields = fields
         self.execution_handler_cls = execution_handler
         self.portfolio_cls = portfolio
         self.strategy_cls = strategy
+        self.ticks_limit = ticks_limit
+
         self.events = queue.Queue()
         self.signals = 0
         self.orders = 0
@@ -56,7 +60,7 @@ class Backtest(object):
     def _generate_trading_instances(self):
         print("Creating DataHandler, Strategy, Portfolio and ExecutionHandler")
         self.data_handler = self.data_handler_cls(self.events, self.csv_dir,
-                                                  self.symbol_list, self.fields)
+                                                  self.symbol_list, self.fields, limit=self.ticks_limit)
         self.strategy = self.strategy_cls(self.data_handler, self.events)
         self.portfolio = self.portfolio_cls(self.data_handler, self.events,
                                             self.start_date,
