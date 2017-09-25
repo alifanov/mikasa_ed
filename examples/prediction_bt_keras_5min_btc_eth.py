@@ -12,13 +12,43 @@ np.random.seed(7)
 
 import pandas as pd
 from strategy import Strategy
-from event import SignalEvent
+from event import SignalEvent, OrderEvent
 from backtest import Backtest
 from data import HistoricCSVDataHandler
 from portfolio import NaivePortfolio
 from execution import SimulatedExecutionHandler
 
 from sklearn.preprocessing import StandardScaler
+
+
+class NaiveStopPortfolio(NaivePortfolio):
+    TILT = 0.001
+
+    def generate_naive_order(self, signal):
+        order = None
+
+        mkt_quantity = 1000.0
+        cur_quantity = self.current_positions[signal.symbol]
+        order_type = 'STP'
+
+        price = self.bars.get_latest_bars(signal.symbol)[0].close
+
+        if signal.signal_type == 'LONG' and cur_quantity == 0:
+            price *= (1.0 + self.TILT)
+            order = OrderEvent(signal.symbol, order_type, mkt_quantity, 'BUY', price)
+        if signal.signal_type == 'SHORT' and cur_quantity == 0:
+            price *= (1.0 - self.TILT)
+            order = OrderEvent(signal.symbol, order_type, mkt_quantity, 'SELL', price)
+
+        if signal.signal_type == 'EXIT':
+            if cur_quantity > 0:
+                price *= (1.0 - self.TILT)
+                order = OrderEvent(signal.symbol, order_type, abs(cur_quantity), 'SELL', price)
+            if cur_quantity < 0:
+                price *= (1.0 + self.TILT)
+                order = OrderEvent(signal.symbol, order_type, abs(cur_quantity), 'BUY', price)
+
+        return order
 
 
 class PredictStrategy(Strategy):
@@ -36,7 +66,7 @@ class PredictStrategy(Strategy):
             df['close-' + str(lag)] = df['close'] - df.shift(lag)['close']
         df.dropna(inplace=True)
 
-        self.close_fields = ['close-{}'.format(i+1) for i in range(self.lag)]
+        self.close_fields = ['close-{}'.format(i + 1) for i in range(self.lag)]
 
         df['up'] = df['close'] < df.shift(-1)['close']
 
@@ -59,10 +89,10 @@ class PredictStrategy(Strategy):
                 X = df[self.close_fields].values
                 X = self.scaler.transform(X)
                 prediction = self.model.predict(X)[0]
-                if prediction[1] > 0.9:
+                if prediction[1] > 0.7:
                     signal = SignalEvent(1, self.symbol_list[0], dt, 'LONG', 1.0)
                     self.events.put(signal)
-                if prediction[0] > 0.9:
+                if prediction[0] > 0.7:
                     signal = SignalEvent(1, self.symbol_list[0], dt, 'EXIT', 1.0)
                     self.events.put(signal)
 
@@ -82,7 +112,7 @@ if __name__ == "__main__":
         start_date,
         HistoricCSVDataHandler,
         SimulatedExecutionHandler,
-        NaivePortfolio,
+        NaiveStopPortfolio,
         PredictStrategy,
         fields=['open', 'high', 'low', 'close']
     )

@@ -65,7 +65,22 @@ class Backtest(object):
         self.portfolio = self.portfolio_cls(self.data_handler, self.events,
                                             self.start_date,
                                             self.initial_capital)
-        self.execution_handler = self.execution_handler_cls(self.events)
+        self.execution_handler = self.execution_handler_cls(self.events, self.portfolio)
+
+    def _process_event(self, event):
+        if event.type == 'MARKET':
+            self.strategy.calculate_signals(event)
+            self.execution_handler.check_stop_orders(event)
+            self.portfolio.update_timeindex(event)
+        elif event.type == 'SIGNAL':
+            self.signals += 1
+            self.portfolio.update_signal(event)
+        elif event.type == 'ORDER':
+            self.orders += 1
+            self.execution_handler.execute_order(event)
+        elif event.type == 'FILL':
+            self.fills += 1
+            self.portfolio.update_fill(event)
 
     def _run_backtest(self):
         while True:
@@ -81,19 +96,7 @@ class Backtest(object):
                     break
                 else:
                     if event is not None:
-                        if event.type == 'MARKET':
-                            self.strategy.calculate_signals(event)
-                            self.execution_handler.check_stop_orders(event)
-                            self.portfolio.update_timeindex(event)
-                        elif event.type == 'SIGNAL':
-                            self.signals += 1
-                            self.portfolio.update_signal(event)
-                        elif event.type == 'ORDER':
-                            self.orders += 1
-                            self.execution_handler.execute_order(event)
-                        elif event.type == 'FILL':
-                            self.fills += 1
-                            self.portfolio.update_fill(event)
+                        self._process_event(event)
             time.sleep(self.heartbeat)
 
     def _output_performance(self):
@@ -123,13 +126,16 @@ class Backtest(object):
         ax1 = fig.add_subplot(311, ylabel='Portfolio value, % ')
         data['equity_curve'].plot(ax=ax1, color="blue", lw=2.)
         plt.grid(True)
+
         # Plot the returns
         ax2 = fig.add_subplot(312, ylabel='Period returns, % ')
         data['returns'].plot(ax=ax2, color="black", lw=2.)
         plt.grid(True)
-        # Plot the returns
+
+        # Plot the total
         ax3 = fig.add_subplot(313, ylabel='Total, % ')
         data['total'].plot(ax=ax3, color="red", lw=2.)
         plt.grid(True)
+
         # Plot the figure
         plt.show()
