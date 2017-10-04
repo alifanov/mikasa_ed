@@ -4,7 +4,7 @@ import pandas as pd
 
 from abc import ABCMeta, abstractmethod
 
-from event import MarketEvent
+from .event import MarketEvent
 
 
 class DataPoint:
@@ -87,7 +87,8 @@ class HistoricCSVDataHandler(DataHandler):
                 'open': b[1].open,
                 'high': b[1].high,
                 'low': b[1].low,
-                'close': b[1].close
+                'close': b[1].close,
+                'volume': b[1].volume
             })
 
     def get_latest_bars_values(self, symbol, val_type, N=1):

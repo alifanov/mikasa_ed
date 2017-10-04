@@ -7,6 +7,8 @@ from sklearn.preprocessing import StandardScaler
 
 
 class PredictStrategy(bt.Strategy):
+    TILT = 0.001
+
     def __init__(self):
         self.dataclose = self.datas[0].close
         self.symbol = 'BTC_ETH'
@@ -41,14 +43,18 @@ class PredictStrategy(bt.Strategy):
             prediction = self.model.predict(X)[0]
             if prediction[1] > 0.7:
                 if not self.position:
-                    self.buy(size=1.0)
+                    price = self.dataclose[0]
+                    price *= (1.0 + self.TILT)
+                    self.buy(size=1.0, price=price, exectype=bt.Order.Stop)
             if prediction[0] > 0.7:
                 if self.position:
-                    self.sell(size=1.0)
+                    price = self.dataclose[0]
+                    price *= (1.0 - self.TILT)
+                    self.sell(size=1.0, price=price, exectype=bt.Order.Stop)
 
 
 if __name__ == '__main__':
-    cerebro = bt.Cerebro()
+    cerebro = bt.Cerebro(cheat_on_open=True)
 
     cerebro.addstrategy(PredictStrategy)
 

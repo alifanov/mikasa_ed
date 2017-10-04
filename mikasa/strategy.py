@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from abc import ABCMeta, abstractmethod
 
-from event import SignalEvent
+from .event import SignalEvent
 
 import statsmodels.api as sm
 
