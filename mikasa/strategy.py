@@ -4,9 +4,6 @@ from abc import ABCMeta, abstractmethod
 
 from .event import SignalEvent
 
-import statsmodels.api as sm
-
-
 class Strategy(object):
     __metaclass__ = ABCMeta
 
