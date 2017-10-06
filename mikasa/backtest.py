@@ -77,7 +77,6 @@ class Backtest(object):
             while True:
                 try:
                     event = self.events.get(False)
-                    print(event.__class__)
                 except queue.Empty:
                     break
                 else:
