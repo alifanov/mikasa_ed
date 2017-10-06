@@ -2,6 +2,8 @@ import datetime
 import os, os.path
 import pandas as pd
 
+from poloniex import Poloniex
+
 from abc import ABCMeta, abstractmethod
 
 from .event import MarketEvent
@@ -112,3 +114,30 @@ class HistoricCSVDataHandler(DataHandler):
                 if bar is not None:
                     self.latest_symbol_data[s].append(bar)
         self.events.put(MarketEvent(market_data={s: self.latest_symbol_data[s][-1] for s in self.symbol_list}))
+
+
+class PoloniexDataHandler(HistoricCSVDataHandler):
+    def __init__(self, events, symbol_list, period):
+        self.events = events
+        self.symbol_list = symbol_list
+
+        self.latest_symbol_data = {s: [] for s in self.symbol_list}
+        self.continue_backtest = True
+
+        self.period = period
+
+    def _get_new_bar(self, symbol):
+        polo = Poloniex()
+        start = datetime.datetime.now() - datetime.timedelta(days=1)
+        data = polo.returnChartData(symbol, period=self.period, start=start.timestamp())[-1]
+
+        yield DataPoint({
+            'symbol': symbol,
+            'datetime': datetime.datetime.fromtimestamp(data['date']),
+            'timestamp': data['date'],
+            'open': data['open'],
+            'high': data['high'],
+            'low': data['low'],
+            'close': data['close'],
+            'volume': data['volume']
+        })

@@ -23,20 +23,6 @@ class Backtest(object):
                  fields,
                  ticks_limit=None
                  ):
-        """
-        Initialises the backtest.
-        Parameters:
-        csv_dir - The hard root to the CSV data directory.
-        symbol_list - The list of symbol strings.
-        intial_capital - The starting capital for the portfolio.
-        heartbeat - Backtest "heartbeat" in seconds
-        start_date - The start datetime of the strategy.
-        data_handler - (Class) Handles the market data feed.
-        execution_handler - (Class) Handles the orders/fills for trades.
-        portfolio - (Class) Keeps track of portfolio current
-        and prior positions.
-        strategy - (Class) Generates signals based on market data.
-        """
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
         self.initial_capital = initial_capital
@@ -58,7 +44,6 @@ class Backtest(object):
         self._generate_trading_instances()
 
     def _generate_trading_instances(self):
-        print("Creating DataHandler, Strategy, Portfolio and ExecutionHandler")
         self.data_handler = self.data_handler_cls(self.events, self.csv_dir,
                                                   self.symbol_list, self.fields, limit=self.ticks_limit)
         self.strategy = self.strategy_cls(self.data_handler, self.events)
@@ -92,6 +77,7 @@ class Backtest(object):
             while True:
                 try:
                     event = self.events.get(False)
+                    print(event.__class__)
                 except queue.Empty:
                     break
                 else:
@@ -101,9 +87,7 @@ class Backtest(object):
 
     def _output_performance(self):
         self.portfolio.create_equity_curve_dataframe()
-        print("Creating summary stats...")
         stats = self.portfolio.output_summary_stats()
-        print("Creating equity curve...")
         print(self.portfolio.equity_curve.tail(10))
         pprint.pprint(stats)
         print("Signals: %s" % self.signals)

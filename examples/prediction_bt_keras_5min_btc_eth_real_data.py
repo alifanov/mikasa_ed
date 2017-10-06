@@ -14,7 +14,7 @@ np.random.seed(7)
 from mikasa.strategy import Strategy
 from mikasa.event import SignalEvent, OrderEvent
 from mikasa.backtest import Backtest
-from mikasa.data import HistoricCSVDataHandler
+from mikasa.data import HistoricCSVDataHandler, PoloniexDataHandler
 from mikasa.portfolio import NaivePortfolio
 from mikasa.execution import SimulatedExecutionHandler
 
@@ -97,24 +97,35 @@ class PredictStrategy(Strategy):
                     self.events.put(signal)
 
 
+class PoloniexBacktest(Backtest):
+    def _generate_trading_instances(self):
+        self.data_handler = self.data_handler_cls(self.events,
+                                                  self.symbol_list, period=300)
+        self.strategy = self.strategy_cls(self.data_handler, self.events)
+        self.portfolio = self.portfolio_cls(self.data_handler, self.events,
+                                            self.start_date,
+                                            self.initial_capital)
+        self.execution_handler = self.execution_handler_cls(self.events, self.portfolio)
+
+
 if __name__ == "__main__":
     csv_dir = '../datasets/5min/'
     symbol_list = ['BTC_ETH', ]
     initial_capital = 1000.0
-    heartbeat = 0.0
-    start_date = datetime.datetime(2016, 9, 9, 0, 0, 1)
+    heartbeat = 1
+    start_date = datetime.datetime.now()
 
-    backtest = Backtest(
+    backtest = PoloniexBacktest(
         csv_dir,
         symbol_list,
         initial_capital,
         heartbeat,
         start_date,
-        HistoricCSVDataHandler,
+        PoloniexDataHandler,
         SimulatedExecutionHandler,
         NaiveStopPortfolio,
         PredictStrategy,
-        fields=['open', 'high', 'low', 'close']
+        fields=['open', 'high', 'low', 'close', 'volume']
     )
     backtest.simulate_trading()
     backtest.plot()
