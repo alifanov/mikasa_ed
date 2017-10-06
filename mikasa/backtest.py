@@ -68,6 +68,7 @@ class Backtest(object):
             self.portfolio.update_fill(event)
 
     def _run_backtest(self):
+        print('Starting backtesting...')
         while True:
             if self.data_handler.continue_backtest:
                 self.data_handler.update_bars()
