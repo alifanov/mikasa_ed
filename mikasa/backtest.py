@@ -21,7 +21,8 @@ class Backtest(object):
                  portfolio,
                  strategy,
                  fields,
-                 ticks_limit=None
+                 ticks_limit=None,
+                 verbose=0
                  ):
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
@@ -35,6 +36,8 @@ class Backtest(object):
         self.portfolio_cls = portfolio
         self.strategy_cls = strategy
         self.ticks_limit = ticks_limit
+
+        self.verbose = verbose
 
         self.events = queue.Queue()
         self.signals = 0
@@ -68,7 +71,8 @@ class Backtest(object):
             self.portfolio.update_fill(event)
 
     def _run_backtest(self):
-        print('Start backtesting...')
+        if self.verbose > 0:
+            print('Start backtesting...')
         while True:
             if self.data_handler.continue_backtest:
                 self.data_handler.update_bars()
@@ -78,6 +82,8 @@ class Backtest(object):
             while True:
                 try:
                     event = self.events.get(False)
+                    if self.verbose > 0:
+                        print('Got new event: {}'.format(event.__class__.__name__))
                 except queue.Empty:
                     break
                 else:

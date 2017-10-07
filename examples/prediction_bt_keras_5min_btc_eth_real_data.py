@@ -109,14 +109,13 @@ class PoloniexBacktest(Backtest):
 
 
 if __name__ == "__main__":
-    csv_dir = '../datasets/5min/'
     symbol_list = ['BTC_ETH', ]
     initial_capital = 1000.0
     heartbeat = 1
     start_date = datetime.datetime.now()
 
     backtest = PoloniexBacktest(
-        csv_dir,
+        None,
         symbol_list,
         initial_capital,
         heartbeat,
@@ -125,7 +124,8 @@ if __name__ == "__main__":
         SimulatedExecutionHandler,
         NaiveStopPortfolio,
         PredictStrategy,
-        fields=['open', 'high', 'low', 'close', 'volume']
+        fields=['open', 'high', 'low', 'close', 'volume'],
+        verbose=1
     )
     backtest.simulate_trading()
     backtest.plot()

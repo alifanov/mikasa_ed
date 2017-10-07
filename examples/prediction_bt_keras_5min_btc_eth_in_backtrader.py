@@ -54,7 +54,7 @@ class PredictStrategy(bt.Strategy):
 
 
 if __name__ == '__main__':
-    cerebro = bt.Cerebro(cheat_on_open=True)
+    cerebro = bt.Cerebro()
 
     cerebro.addstrategy(PredictStrategy)
 
